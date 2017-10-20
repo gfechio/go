@@ -1,39 +1,52 @@
 package main
 
 import (
-	"fmt"
-	"github.com/fsouza/go-dockerclient"
+	"io"
 	"os"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
+	"golang.org/x/net/context"
 )
 
-//func check(e error) {
-//	if e != nil {
-//		panic(e)
-//	}
-//}
-
 func main() {
-	if _, err := os.Stat("webserver"); os.IsNotExist(err) {
-		fmt.Println("Creating Dockerfile")
-
-		endpoint := "unix:///var/run/docker.sock"
-		client, err := docker.NewClient(endpoint)
-		if err != nil {
-			panic(err)
-		}
-
-		imgs, err := client.ListImages(docker.ListImagesOptions{All: false})
-		if err != nil {
-			panic(err)
-		}
-
-		for _, img := range imgs {
-			fmt.Println("ID: ", img.ID)
-			fmt.Println("RepoTags: ", img.RepoTags)
-			fmt.Println("Created: ", img.Created)
-			fmt.Println("Size: ", img.Size)
-			fmt.Println("VirtualSize: ", img.VirtualSize)
-			fmt.Println("ParentId: ", img.ParentID)
-		}
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
 	}
+
+	_, err = cli.ImagePull(ctx, "docker.io/library/scratch", types.ImagePullOptions{})
+	if err != nil {
+		panic(err)
+	}
+
+	resp, err := cli.ContainerCreate(ctx, &container.Config{
+		Image: "scratch",
+		Cmd:   []string{"webserver"},
+	}, nil, nil, "")
+	if err != nil {
+		panic(err)
+	}
+
+	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+		panic(err)
+	}
+
+	statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
+	select {
+	case err := <-errCh:
+		if err != nil {
+			panic(err)
+		}
+	case <-statusCh:
+	}
+
+	out, err := cli.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
+	if err != nil {
+		panic(err)
+	}
+
+	io.Copy(os.Stdout, out)
 }
