@@ -16,7 +16,7 @@ func main() {
 	}
 	http.HandleFunc("/gif", handler)
 	http.HandleFunc("/count", counter)
-	log.Fatal(http.ListenAndServe("localhost:8001", nil))
+	log.Fatal(http.ListenAndServe(":8001", nil))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
