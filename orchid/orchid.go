@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
+	"github.com/moby/moby/container"
 	"os"
 )
 
@@ -41,12 +42,11 @@ func list() {
 func run() {
 	image := os.Args[2]
 	ports := os.Args[3:4]
-	//	command := os.Args[5]
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		panic(err)
 	}
-
+	NewBaseContainer(id, root string)
 	containers := cli.ContainerStart(context.Background(), image, ports)
 }
 
