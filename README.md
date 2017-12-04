@@ -1,13 +1,10 @@
-# GO Lang projects
+# GOLang projects
 
-Strating project to learn golang
+Little projects in Golang that don't really need a repo for their own
 
 ## Getting Started
 
-The plan here is:
- -  Have a small orchestrator
- -  Create a LB func  to handle HTTP requests and test concurrency
- - If possible include ACL features
+ - Emailing : Send email and check mailbox. (graphite submissions TODO)
 
 ### Prerequisites
 
@@ -18,31 +15,9 @@ The plan here is:
 TO DO
 ```
 
-```
-TO DO
-```
-
-## Running the tests
-
-The orchestration of dockers will be part of the testing 
-
-### Break down into end to end tests
-
-```
-```
-
-### And coding style tests
-
-```
-```
-
-## Deployment
-
 ## Built With
 
-## Contributing
-
-## Versioning
+golang ? maybe docker in the future
 
 
 ## Authors
