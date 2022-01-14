@@ -1,0 +1,89 @@
+name: Go test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  golang-dir:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Golang directories to be tested
+        id: golang-dir
+        run: |
+          echo ::set-output name=golang-directories::"$(find -name *.go -not -path "./test/*" | xargs -I{} dirname {})"
+
+  format:
+    name: Formatting and Vet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Get dependencies
+        run: |
+          for dir in ${{ steps.golang-dir.ouputs.golang-directories }} ; do
+            go get -v -d $dir/...
+            if [ -f Gopkg.toml ]; then
+                curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+                dep ensure
+            fi
+          done
+
+      - name: Format
+        run: |
+          for dir in ${{ steps.golang-dir.ouputs.golang-directories }} ; do
+            if [[ $(gofmt -d . | wc -c) -ne 0 ]]; then
+              gofmt -d $dir/
+              exit 1
+            fi
+          done
+
+      - name: Vet
+        run: |
+          for dir in ${{ steps.golang-dir.ouputs.golang-directories }} ; do
+            go vet $dir/...
+          done
+  test:
+    runs-on: ubuntu-latest
+    name: Test Go
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+
+      - name: Get dependencies
+        run: |
+          for dir in ${{ steps.golang-dir.ouputs.golang-directories }} ; do
+            go get -v -d $dir/...
+            if [ -f Gopkg.toml ]; then
+                curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+                dep ensure
+            fi
+          done
+
+      - name: Test
+        run: |
+          for dir in ${{ steps.golang-dir.ouputs.golang-directories }} ; do
+            go test -v $dir/...
+          done
+
+      - name: Race Condition
+        run: |
+          for dir in ${{ steps.golang-dir.ouputs.golang-directories }} ; do
+            go test -race
+          done
+
