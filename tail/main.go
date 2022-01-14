@@ -2,15 +2,15 @@ package tail
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"time"
-	"flag"
-	"log"
 )
 
-func main ()  {
+func main() {
 	FilePtr := flag.String("file", "", "File to be tailed.")
 	flag.Parse()
 	if *filePtr == "" {
@@ -18,7 +18,7 @@ func main ()  {
 		os.Exit(1)
 	}
 	file, err := os.Open(*FilePtr)
-	if err != nil	{
+	if err != nil {
 		log.Fatal("Could not Open file %s", *FilePtr)
 	}
 	reader := bufio.NewReader(file)
@@ -42,15 +42,15 @@ func main ()  {
 				continue
 			}
 			break
-			log.Errorf( "Could not read line. Jumping to next line.")
+			log.Errorf("Could not read line. Jumping to next line.")
 		}
 		fmt.Println("%s\n", string(line))
 	}
 }
 
-func isTruncated (file *os.File) (bool, error) {
+func isTruncated(file *os.File) (bool, error) {
 	currentPosition, err := file.Seek(0, io.SeekCurrent)
-	if err != nil { 
+	if err != nil {
 		return false, err
 	}
 	fileInfo, err := file.Stat()
