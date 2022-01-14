@@ -11,7 +11,7 @@ import (
 )
 
 func send() {
-	auth := smtp.PlainAuth("", "recipient@example.com", "passwd", "maildirector.lhr4.prod.example.com")
+	auth := smtp.PlainAuth("", "recipient@example.com", "passwd", "mailhost.example.com")
 
 	to := []string{"recipient@example.com"}
 	msg := []byte("To: recipient@example.com\r\n" +
@@ -31,7 +31,7 @@ func check_imap() {
 		rsp *imap.Response
 	)
 
-	c, _ = imap.Dial("maildirector.lhr4.prod.example.com")
+	c, _ = imap.Dial("mailhost.example.com")
 	defer c.Logout(30 * time.Second)
 	fmt.Println("Server says hello:", c.Data[0].Info)
 	c.Data = nil
