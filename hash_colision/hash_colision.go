@@ -2,7 +2,6 @@ package main
 
 import (
         "fmt"
-        "hash"
         "os"
         "math"
 
@@ -16,7 +15,6 @@ func calculateCollisionProbability(hashLength int, numEntries float64) float64 {
 }
 
 func calculateCollisionProbabilityCmd(cmd *cobra.Command, args []string) {
-        algorithm, _ := cmd.Flags().GetString("algorithm")
         hashLength, _ := cmd.Flags().GetInt("hash-length")
         numEntries, _ := cmd.Flags().GetFloat64("num-entries")
 
