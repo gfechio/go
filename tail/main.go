@@ -13,7 +13,7 @@ import (
 func main() {
 	FilePtr := flag.String("file", "", "File to be tailed.")
 	flag.Parse()
-	if *filePtr == "" {
+	if *FilePtr == "" {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -41,8 +41,7 @@ func main() {
 				}
 				continue
 			}
-			break
-			log.Errorf("Could not read line. Jumping to next line.")
+			log.Fatal("Could not read line. Jumping to next line.")
 		}
 		fmt.Println("%s\n", string(line))
 	}
